@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
+export interface SemesterReport {
+  semester: string;
+  academicYear: string;
+  gpa: number;
+  credits: number;
   status: string;
 }

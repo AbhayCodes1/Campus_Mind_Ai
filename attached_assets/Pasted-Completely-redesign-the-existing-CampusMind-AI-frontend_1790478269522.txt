@@ -1,0 +1,22 @@
+Completely redesign the existing CampusMind AI frontend into a premium, modern, clean, professional SaaS dashboard. The current UI is cluttered, congested, poorly spaced, and visually unappealing. Do not just change colors; rebuild the layout and visual hierarchy properly.
+
+DESIGN REFERENCE: Stripe + Linear + Notion quality, with a polished modern academic SaaS aesthetic. Use a clean white/light background, subtle blue and indigo accents, soft borders, generous whitespace, consistent spacing, rounded 12-16px cards, subtle shadows, and premium typography. Avoid huge blue backgrounds, excessive gradients, cramped sections, unnecessary text blocks, and oversized components.
+
+LAYOUT:
+1. Create a slim, fixed left sidebar with CampusMind AI logo, Overview, Student Reports, Attendance, Fees, Results, Assignments, Exams, Documents, and Settings. Use consistent Lucide icons, clear active states, and collapsible navigation.
+2. Create a clean top navbar with page title, breadcrumb, global student search, notifications, and user profile.
+3. Dashboard: welcome header, student selector, compact KPI cards for attendance, pending fees, GPA, and assignments. Use a responsive grid with proper alignment and equal card heights.
+4. Add elegant attendance progress bars, a readable subject-wise table, upcoming deadlines, and recent activity. Use charts only when they add useful information.
+5. Create a dedicated student report page with a student profile header, tabs for Overview, Attendance, Fees, Results, Assignments, and Exams. Add a clear Download PDF and Export Excel button.
+6. Build a premium AI assistant page with a spacious chat interface, readable messages, suggested prompts, loading indicators, and a clean input bar. Make it easy to ask for a complete student report in natural language.
+
+RESPONSIVENESS AND QUALITY:
+- Fully responsive on desktop, tablet, and mobile.
+- Use consistent typography, spacing, colors, and reusable components.
+- Add subtle hover effects and smooth transitions; avoid distracting animations.
+- Fix all overflow, overlapping text, tiny fonts, awkward wrapping, and excessive empty space.
+- Ensure strong contrast, accessible controls, loading, empty, and error states.
+- Keep all existing backend API endpoints, database queries, synthetic data, report calculations, authentication, and functionality intact. Do not replace working functionality with mock data or static UI.
+- Use the existing frontend stack and installed libraries where possible. Do not add paid services, paid APIs, or require billing.
+
+First inspect the existing project and components, then implement the redesign directly in the codebase. Run the application, inspect the actual preview at desktop and mobile widths, fix layout issues, and continue until the result looks polished and production-quality. Do not stop at a design plan or description. Make the actual code changes.

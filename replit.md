@@ -1,15 +1,15 @@
-# [Project name]
+# CampusMind AI
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+CampusMind AI is a free, full-stack college operations dashboard that queries 500+ synthetic SQLite student records and turns them into searchable reports.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server with local SQLite seeding
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Optional env: `CAMPUSMIND_SQLITE_PATH` and `SESSION_SECRET`; the app runs without paid services or AI keys
 
 ## Stack
 
@@ -22,23 +22,31 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/campusmind-ai/src` — responsive dashboard, student search, reports, exports, role/demo access, and assistant UI
+- `artifacts/api-server/src/lib/sqlite.ts` — SQLite schema, indexes, and deterministic 500-student synthetic seed
+- `artifacts/api-server/src/lib/reports.ts` — parameterized report and dashboard queries plus CSV export
+- `artifacts/api-server/src/routes` — health, campus, assistant, and demo-role endpoints
+- `lib/api-spec/openapi.yaml` — source-of-truth API contract and generated client hooks
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The runtime database is a local SQLite file so the free demo does not require a managed database or billing.
+- The assistant is rule-based demo mode by design; it always queries SQLite and asks for a student ID when names are ambiguous.
+- All student data is deterministic, fictional, and labeled as synthetic demo data.
+- Demo roles are enforced on the backend with a signed HttpOnly cookie; student access is limited to the seeded demo student.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Search students, open complete academic and finance reports, inspect attendance and results, export PDF/CSV, and ask the rule-based assistant for a report in natural language.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep the app free to run: no paid AI service, subscription, or billing requirement.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The SQLite file is created on API startup and ignored by Git.
+- When API contracts change, run `pnpm --filter @workspace/api-spec run codegen`.
 
 ## Pointers
 

@@ -11,6 +11,23 @@ out-tsc
 # dependencies
 node_modules
 
+# environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# secrets / credentials
+auth/*.json
+secrets/
+credentials/
+**/*secret*
+**/*credential*
+
 # IDEs and editors
 /.idea
 .project
@@ -41,9 +58,26 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# GitHub / AI tool metadata
+.cursor/
+.github/instructions/
 
 # Replit
 .cache/
 .local/
+
+# Local CampusMind demo database and caches
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
+**/*.db
+**/*.db-journal
+artifacts/**/data/*.sqlite
+artifacts/**/data/*.sqlite-shm
+artifacts/**/data/*.sqlite-wal
+
+# Build artifacts and logs
+*.log
+build/
+out/
+coverage/

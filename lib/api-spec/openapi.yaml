@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: campus
+    description: CampusMind synthetic student records and reports
+  - name: assistant
+    description: Natural-language report assistant
 paths:
   /healthz:
     get:
@@ -24,6 +28,88 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [campus]
+      summary: Get dashboard overview
+      responses:
+        "200":
+          description: Dashboard overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /students:
+    get:
+      operationId: listStudents
+      tags: [campus]
+      summary: Search synthetic students
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: studentId
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Matching students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentSummary"
+  /students/{studentId}/report:
+    get:
+      operationId: getStudentReport
+      tags: [campus]
+      summary: Get a complete student report
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Complete student report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentReport"
+        "404":
+          description: Student not found
+  /assistant/query:
+    post:
+      operationId: queryAssistant
+      tags: [assistant]
+      summary: Resolve a natural-language request with database tools
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssistantQueryInput"
+      responses:
+        "200":
+          description: Assistant answer and structured report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantQueryResponse"
+        "400":
+          description: Invalid or ambiguous request
 components:
   schemas:
     HealthStatus:
@@ -33,4 +119,304 @@ components:
           type: string
       required:
         - status
+    DashboardSummary:
+      type: object
+      properties:
+        totalStudents:
+          type: integer
+        totalCourses:
+          type: integer
+        activeSemesters:
+          type: integer
+        attendanceAtRisk:
+          type: integer
+        pendingFees:
+          type: number
+        assignmentsDue:
+          type: integer
+        syntheticLabel:
+          type: string
+      required:
+        - totalStudents
+        - totalCourses
+        - activeSemesters
+        - attendanceAtRisk
+        - pendingFees
+        - assignmentsDue
+        - syntheticLabel
+    StudentSummary:
+      type: object
+      properties:
+        studentId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        department:
+          type: string
+        year:
+          type: integer
+        avatarSeed:
+          type: string
+      required:
+        - studentId
+        - name
+        - email
+        - department
+        - year
+        - avatarSeed
+    StudentProfile:
+      type: object
+      properties:
+        studentId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        department:
+          type: string
+        year:
+          type: integer
+        dateOfBirth:
+          type: string
+        enrollmentDate:
+          type: string
+        syntheticLabel:
+          type: string
+      required:
+        - studentId
+        - name
+        - email
+        - phone
+        - department
+        - year
+        - dateOfBirth
+        - enrollmentDate
+        - syntheticLabel
+    SemesterReport:
+      type: object
+      properties:
+        semester:
+          type: string
+        academicYear:
+          type: string
+        gpa:
+          type: number
+        credits:
+          type: integer
+        status:
+          type: string
+      required:
+        - semester
+        - academicYear
+        - gpa
+        - credits
+        - status
+    AttendanceReport:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        courseName:
+          type: string
+        attended:
+          type: integer
+        held:
+          type: integer
+        percentage:
+          type: number
+        shortage:
+          type: integer
+        status:
+          type: string
+      required:
+        - courseCode
+        - courseName
+        - attended
+        - held
+        - percentage
+        - shortage
+        - status
+    FeeReport:
+      type: object
+      properties:
+        semester:
+          type: string
+        total:
+          type: number
+        paid:
+          type: number
+        pending:
+          type: number
+        status:
+          type: string
+      required:
+        - semester
+        - total
+        - paid
+        - pending
+        - status
+    AssignmentReport:
+      type: object
+      properties:
+        title:
+          type: string
+        courseCode:
+          type: string
+        dueDate:
+          type: string
+        score:
+          type: ["number", "null"]
+        maxMarks:
+          type: number
+        status:
+          type: string
+      required:
+        - title
+        - courseCode
+        - dueDate
+        - score
+        - maxMarks
+        - status
+    ExamReport:
+      type: object
+      properties:
+        title:
+          type: string
+        courseCode:
+          type: string
+        examDate:
+          type: string
+        room:
+          type: string
+      required:
+        - title
+        - courseCode
+        - examDate
+        - room
+    ResultReport:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        courseName:
+          type: string
+        internalMarks:
+          type: number
+        examMarks:
+          type: number
+        totalMarks:
+          type: number
+        grade:
+          type: string
+        gradePoint:
+          type: number
+      required:
+        - courseCode
+        - courseName
+        - internalMarks
+        - examMarks
+        - totalMarks
+        - grade
+        - gradePoint
+    StudentReport:
+      type: object
+      properties:
+        profile:
+          $ref: "#/components/schemas/StudentProfile"
+        semesters:
+          type: array
+          items:
+            $ref: "#/components/schemas/SemesterReport"
+        attendance:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttendanceReport"
+        fees:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeeReport"
+        assignments:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssignmentReport"
+        upcomingExams:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExamReport"
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResultReport"
+        totals:
+          type: object
+          properties:
+            feeTotal:
+              type: number
+            feePaid:
+              type: number
+            feePending:
+              type: number
+            attendancePercentage:
+              type: number
+            attendanceShortage:
+              type: integer
+          required:
+            - feeTotal
+            - feePaid
+            - feePending
+            - attendancePercentage
+            - attendanceShortage
+        syntheticLabel:
+          type: string
+      required:
+        - profile
+        - semesters
+        - attendance
+        - fees
+        - assignments
+        - upcomingExams
+        - results
+        - totals
+        - syntheticLabel
+    AssistantQueryInput:
+      type: object
+      properties:
+        message:
+          type: string
+          minLength: 1
+        studentId:
+          type: ["string", "null"]
+      required:
+        - message
+    AssistantQueryResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+        intent:
+          type: string
+        report:
+          oneOf:
+            - $ref: "#/components/schemas/StudentReport"
+            - type: "null"
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentSummary"
+        needsClarification:
+          type: boolean
+        syntheticLabel:
+          type: string
+      required:
+        - answer
+        - intent
+        - report
+        - matches
+        - needsClarification
+        - syntheticLabel
 

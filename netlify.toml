@@ -1,0 +1,11 @@
+[build]
+  command = "pnpm --filter @workspace/campusmind-ai run build"
+  publish = "artifacts/campusmind-ai/dist/public"
+
+[build.environment]
+  VITE_API_BASE_URL = "https://campusmind-ai-backend.onrender.com"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

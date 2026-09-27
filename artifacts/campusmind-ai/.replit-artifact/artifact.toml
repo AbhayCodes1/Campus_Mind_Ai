@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "CampusMind AI"
+description = "A secure college operations dashboard for synthetic demo student records, role-based access, natural-language student reports, attendance, fees, academic performance, and report exports."
+version = "1.0.0"
+id = "artifacts/campusmind-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25836
+
+[services.development]
+run = "pnpm --filter @workspace/campusmind-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/campusmind-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/campusmind-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25836"
+BASE_PATH = "/"

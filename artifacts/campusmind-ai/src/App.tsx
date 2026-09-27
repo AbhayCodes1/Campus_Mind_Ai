@@ -1245,6 +1245,9 @@ function Assistant() {
   const [message, setMessage] = useState('');
   const query = useQueryAssistant();
   const response = query.data;
+  const errorMessage = query.error instanceof Error
+    ? query.error.message.replace(/^HTTP \d+ [^:]+:\s*/, '')
+    : 'CampusMind could not resolve that request.';
 
   const ask = (text = message) => {
     if (text.trim()) query.mutate({ data: { message: text.trim(), studentId: null } });
@@ -1331,7 +1334,7 @@ function Assistant() {
           className="rounded-lg border border-destructive/30 bg-destructive/8 px-4 py-3 text-[13px] text-destructive"
           data-testid="status-assistant-error"
         >
-          CampusMind could not resolve that request. Try a student name or ID.
+          {errorMessage}
         </div>
       )}
 

@@ -18,6 +18,7 @@ test('parses attendance threshold query', () => {
   const parsed = parseQuery('Show attendance below 75 percent.');
   assert.equal(parsed.intent, 'attendance');
   assert.equal(parsed.threshold, 75);
+  assert.equal(parsed.studentName, undefined);
 });
 
 test('parses pending fee query', () => {
@@ -43,6 +44,16 @@ test('resolves attendance query against threshold', () => {
 test('resolves pending fee query', () => {
   const result = resolveAssistantQuery('Who has pending fees?', access);
   assert.match(result.answer, /Pending fees|no pending fee|outstanding/i);
+});
+
+test('filters exam queries by the requested course', () => {
+  const parsed = parseQuery('Show exam schedule for DBMS');
+  assert.equal(parsed.intent, 'exams');
+  assert.equal(parsed.courseCode, 'DBMS');
+
+  const result = resolveAssistantQuery('Show exam schedule for DBMS', access);
+  assert.match(result.answer, /DBMS/i);
+  assert.match(result.answer, /no upcoming exam schedule/i);
 });
 
 test('handles unsupported query safely', () => {

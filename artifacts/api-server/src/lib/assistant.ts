@@ -128,6 +128,11 @@ const stopWords = new Set([
   "list",
   "compare",
   "shortage",
+  "has",
+  "have",
+  "schedule",
+  "scheduled",
+  "timetable",
 ]);
 
 export function normalizeText(value: string): string {
@@ -159,7 +164,7 @@ function extractStudentName(message: string): string | undefined {
 
   const cleaned = cleanEntityText(message)
     .split(" ")
-    .filter((token) => token && !stopWords.has(token))
+    .filter((token) => token && /^[a-z]+$/i.test(token) && !stopWords.has(token))
     .join(" ")
     .trim();
 
@@ -199,11 +204,19 @@ function extractCourseCode(message: string): string | undefined {
   return match ? match[0].toUpperCase() : undefined;
 }
 
+function extractCourseSearch(message: string): string | undefined {
+  const explicitCode = extractCourseCode(message);
+  if (explicitCode) return explicitCode;
+
+  const match = message.match(/(?:for|in)\s+([a-z][a-z0-9 &-]{1,60})[?.!]*$/i);
+  return match?.[1].trim();
+}
+
 function parseQuery(message: string): ParsedAssistantQuery {
   const studentId = extractStudentId(message);
   const department = extractDepartment(message);
   const threshold = extractThreshold(message);
-  const courseCode = extractCourseCode(message);
+  const courseCode = extractCourseSearch(message);
 
   const isCountQuery = /(how many|count|total number|number of|total students|students enrolled|enrolled)/i.test(message);
   const isReportQuery = /(complete report|full report|profile|student report|details of|report of|report for)/i.test(message) || /report/i.test(message);
@@ -496,6 +509,7 @@ export function resolveAssistantQuery(message: string, access: { role: string; s
   }
 
   if (parsed.intent === "exams") {
+    const courseFilter = parsed.courseCode?.trim();
     const rows = sqlite
       .prepare(
         `SELECT e.title, c.code AS courseCode, e.exam_date AS examDate, e.room
@@ -503,13 +517,17 @@ export function resolveAssistantQuery(message: string, access: { role: string; s
          JOIN courses c ON c.id = e.course_id
          JOIN semesters se ON se.id = e.semester_id
          WHERE se.is_current = 1 AND date(e.exam_date) >= date('now')
+           AND (? IS NULL OR UPPER(c.code) = UPPER(?) OR LOWER(c.name) LIKE '%' || LOWER(?) || '%')
          ORDER BY e.exam_date ASC
          LIMIT 10`,
       )
-      .all() as Array<{ title: string; courseCode: string; examDate: string; room: string }>;
+      .all(courseFilter ?? null, courseFilter ?? null, courseFilter ?? null) as Array<{ title: string; courseCode: string; examDate: string; room: string }>;
 
     if (!rows.length) {
-      return { answer: "There are no upcoming exam dates in the current semester.", intent: "exams", report: null, matches: [], needsClarification: false, syntheticLabel };
+      const answer = courseFilter
+        ? `There is no upcoming exam schedule for ${courseFilter.toUpperCase()} in the current dataset.`
+        : "There are no upcoming exam dates in the current semester.";
+      return { answer, intent: "exams", report: null, matches: [], needsClarification: false, syntheticLabel };
     }
 
     return {
